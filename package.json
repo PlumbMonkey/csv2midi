@@ -2,7 +2,7 @@
   "name": "csv2midi",
   "version": "0.1.0",
   "description": "Convert CSV to MIDI files - Project Beyond MIDI",
-  "main": "dist/index.js",
+  "main": "standalone.js",
   "bin": {
     "csv2midi": "dist/cli/cli.js"
   },
@@ -18,7 +18,18 @@
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts tests/**/*.ts",
     "clean": "rimraf dist",
-    "prebuild": "npm run clean"
+    "prebuild": "npm run clean",
+    "package": "pkg . --targets node18-win-x64 --output csv2midi-converter.exe",
+    "package:all": "pkg . --targets node18-win-x64,node18-macos-x64,node18-linux-x64"
+  },
+  "pkg": {
+    "assets": [
+      "dist/**/*",
+      "src/web/public/**/*",
+      "node_modules/csv-parse/**/*"
+    ],
+    "scripts": "dist/**/*.js",
+    "outputPath": "build"
   },
   "keywords": [
     "midi",
@@ -44,6 +55,7 @@
     "@typescript-eslint/parser": "^6.16.0",
     "eslint": "^8.56.0",
     "jest": "^29.7.0",
+    "pkg": "^5.8.1",
     "prettier": "^3.1.1",
     "rimraf": "^6.1.2",
     "ts-jest": "^29.1.1",
