@@ -1,0 +1,9 @@
+track,time,type,channel,note,velocity,program,controller,value,tempo,meta_text
+2,0,track_name,, , , , , ,,"Piano"
+2,0,program_change,0,, ,0,,,,
+2,0,note_on,0,60,100,,,,,
+2,480,note_off,0,60,0,,,,,
+2,480,note_on,0,64,100,,,,,
+2,960,note_off,0,64,0,,,,,
+2,960,note_on,0,67,100,,,,,
+2,1440,note_off,0,67,0,,,,,

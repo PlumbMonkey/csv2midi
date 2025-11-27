@@ -1,0 +1,15 @@
+track,time,type,channel,note,velocity,program,controller,value,tempo,meta_text
+0,0,set_tempo,, , , , , ,500000,
+0,0,track_name,, , , , , ,,"Drums"
+0,0,note_on,9,36,100,,,,,
+0,480,note_off,9,36,0,,,,,
+0,480,note_on,9,38,90,,,,,
+0,960,note_off,9,38,0,,,,,
+1,0,track_name,, , , , , ,,"Bass"
+1,0,program_change,0,, ,33,,,,
+1,0,note_on,0,36,80,,,,,
+1,960,note_off,0,36,0,,,,,
+2,0,track_name,, , , , , ,,"Melody"
+2,0,program_change,0,, ,0,,,,
+2,0,note_on,0,60,100,,,,,
+2,480,note_off,0,60,0,,,,,

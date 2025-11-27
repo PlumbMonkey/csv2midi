@@ -1,0 +1,10 @@
+track,time,type,channel,note,velocity,program,controller,value,tempo,meta_text
+1,0,set_tempo,, , , , , ,500000,
+1,0,track_name,, , , , , ,,"Bass"
+1,0,program_change,0,, ,33,,,,
+1,0,note_on,0,36,80,,,,,
+1,960,note_off,0,36,0,,,,,
+1,960,note_on,0,38,80,,,,,
+1,1920,note_off,0,38,0,,,,,
+1,1920,note_on,0,36,80,,,,,
+1,2880,note_off,0,36,0,,,,,
