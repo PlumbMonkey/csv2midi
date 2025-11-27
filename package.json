@@ -55,6 +55,7 @@
     "@typescript-eslint/parser": "^6.16.0",
     "eslint": "^8.56.0",
     "jest": "^29.7.0",
+    "nsis": "^0.0.0",
     "pkg": "^5.8.1",
     "prettier": "^3.1.1",
     "rimraf": "^6.1.2",
