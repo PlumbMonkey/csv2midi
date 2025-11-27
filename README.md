@@ -14,22 +14,32 @@ A robust, easy-to-use tool to convert human-readable CSV files into standards-co
 
 ## 🚀 Quick Start
 
-### CLI
+### Option 1: From GitHub (Free & Open Source)
 
 ```bash
-npm install -g csv2midi
-
-# Convert a CSV to MIDI
-csv2midi music.csv output.mid
-
-# With options
-csv2midi music.csv output.mid --ppq 480 --time-units beats --tempo-unit bpm
+git clone https://github.com/PlumbMonkey/csv2midi.git
+cd csv2midi
+npm install
+npm run web
 ```
 
-### Programmatic (Node.js)
+Open **http://localhost:3000** to start converting!
+
+See **[RUN_FROM_GITHUB.md](./RUN_FROM_GITHUB.md)** for detailed setup options.
+
+### Option 2: CLI
+
+```bash
+npm start -- input.csv output.mid
+
+# With options
+npm start -- input.csv output.mid --ppq 480 --time-units beats --tempo-unit bpm
+```
+
+### Option 3: Programmatic (Node.js)
 
 ```javascript
-const { Converter } = require('csv2midi');
+const { Converter } = require('./dist/core');
 
 const converter = new Converter({
   ppq: 480,
@@ -41,17 +51,6 @@ converter.convertFile('input.csv', 'output.mid').then(result => {
   console.log(result.success ? '✓ Done!' : '✗ Failed');
 });
 ```
-
-### Web UI
-
-```bash
-npm install
-npm run web
-
-# Visit http://localhost:3000
-```
-
-Upload a CSV, set options, and download the `.mid` file — no server account needed.
 
 ## 📋 CSV Format
 
