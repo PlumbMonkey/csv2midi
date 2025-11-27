@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSV → MIDI Converter</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .upload-area {
+      border: 2px dashed #667eea;
+      border-radius: 8px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #f8f9ff;
+    }
+
+    .upload-area:hover {
+      border-color: #764ba2;
+      background: #f0f2ff;
+    }
+
+    .upload-area.dragover {
+      border-color: #764ba2;
+      background: #e8ebff;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .file-name {
+      color: #667eea;
+      font-weight: 500;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .option-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input, select {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-convert {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-convert:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-convert:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-clear {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-clear:hover {
+      background: #e0e0e0;
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+
+    .status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+      display: block;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .info-box {
+      background: #f0f2ff;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    a {
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 25px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .options {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎵 CSV → MIDI Converter</h1>
+    <p class="subtitle">Convert your CSV files to playable MIDI in seconds</p>
+
+    <form id="converterForm">
+      <!-- File Upload -->
+      <div class="form-group">
+        <label>CSV File</label>
+        <div class="upload-area" id="uploadArea">
+          <div>📁 Drag & drop your CSV here or click to select</div>
+          <div class="file-name" id="fileName"></div>
+          <input type="file" id="fileInput" accept=".csv" required>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="form-group">
+        <label>Conversion Options</label>
+        <div class="options">
+          <div class="option-group">
+            <label for="ppq">PPQ (Pulses/Quarter)</label>
+            <input type="number" id="ppq" name="ppq" value="480" min="1" required>
+          </div>
+          <div class="option-group">
+            <label for="timeUnits">Time Unit</label>
+            <select id="timeUnits" name="timeUnits" required>
+              <option value="ticks">Ticks (default)</option>
+              <option value="beats">Beats</option>
+              <option value="ms">Milliseconds</option>
+            </select>
+          </div>
+          <div class="option-group">
+            <label for="tempoUnit">Tempo Unit</label>
+            <select id="tempoUnit" name="tempoUnit" required>
+              <option value="uspb">USPB (default)</option>
+              <option value="bpm">BPM</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="button-group">
+        <button type="submit" class="btn-convert" id="convertBtn">Convert to MIDI</button>
+        <button type="reset" class="btn-clear">Clear</button>
+      </div>
+    </form>
+
+    <!-- Status Messages -->
+    <div class="status" id="status"></div>
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p style="margin-top: 10px; color: #666;">Converting...</p>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+      <strong>Need help?</strong><br>
+      See the <a href="https://github.com/your-repo/docs/CSV_FORMAT.md" target="_blank">CSV format guide</a> or 
+      check out <a href="https://github.com/your-repo/samples" target="_blank">example files</a>.
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('converterForm');
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileName = document.getElementById('fileName');
+    const status = document.getElementById('status');
+    const loading = document.getElementById('loading');
+    const convertBtn = document.getElementById('convertBtn');
+
+    // File upload handling
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        updateFileName();
+      }
+    });
+
+    fileInput.addEventListener('change', updateFileName);
+
+    function updateFileName() {
+      if (fileInput.files.length > 0) {
+        fileName.textContent = `✓ ${fileInput.files[0].name}`;
+      } else {
+        fileName.textContent = '';
+      }
+    }
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideStatus();
+
+      if (!fileInput.files.length) {
+        showStatus('Please select a CSV file', 'error');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('ppq', document.getElementById('ppq').value);
+      formData.append('timeUnits', document.getElementById('timeUnits').value);
+      formData.append('tempoUnit', document.getElementById('tempoUnit').value);
+
+      loading.style.display = 'block';
+      convertBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/convert', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          // Download MIDI file
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileInput.files[0].name.replace('.csv', '.mid');
+          a.click();
+          window.URL.revokeObjectURL(url);
+
+          showStatus('✓ Conversion successful! Your MIDI file is ready to download.', 'success');
+        } else {
+          const result = await response.json();
+          const errorMsg = result.errors?.join('\n') || 'Conversion failed';
+          showStatus(`✗ ${errorMsg}`, 'error');
+        }
+      } catch (err) {
+        showStatus(`✗ Error: ${err.message}`, 'error');
+      } finally {
+        loading.style.display = 'none';
+        convertBtn.disabled = false;
+      }
+    });
+
+    function showStatus(message, type) {
+      status.textContent = message;
+      status.className = `status ${type}`;
+      status.style.display = 'block';
+    }
+
+    function hideStatus() {
+      status.style.display = 'none';
+    }
+
+    form.addEventListener('reset', () => {
+      fileInput.value = '';
+      fileName.textContent = '';
+      hideStatus();
+    });
+  </script>
+</body>
+</html>
